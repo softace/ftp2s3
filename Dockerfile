@@ -13,10 +13,6 @@ RUN yum install -y \
   proftpd-utils \
   supervisor
 
-COPY supervisord.conf /etc/supervisord.conf
-
-RUN /sbin/proftpd --configtest
-
 run yum install -y \
   automake \
   fuse \
@@ -40,4 +36,17 @@ make install && \
 popd && \
 rm -rf s3fs-fuse-${FUSE_VERSION}
 
-CMD ["/bin/supervisord"]
+COPY supervisord.conf /etc/supervisord.conf
+
+ENV STORAGE_PATH=/mnt/storage
+RUN mkdir ${STORAGE_PATH}
+
+RUN /sbin/proftpd --configtest
+
+COPY docker-entrypoint.sh /
+
+ENV PASSWORD_FILE=/hostfs/passwd-s3fs
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["supervisord"]
+
