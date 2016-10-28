@@ -12,5 +12,5 @@ Run the bridge
 ==============
 
 ```
-docker run -it --rm -e BUCKET_NAME=buck -v /tmp/passwd-s3fs:/hostfs/passwd-s3fs --name ftp2s3 ftp2s3
+docker run -it --rm -e BUCKET_NAME=buck -e S3_URL=http://localhost/ --privileged --cap-add SYS_ADMIN --device /dev/fuse --name ftp2s3 ftp2s3
 ```

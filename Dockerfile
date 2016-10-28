@@ -37,15 +37,14 @@ popd && \
 rm -rf s3fs-fuse-${FUSE_VERSION}
 
 COPY supervisord.conf /etc/supervisord.conf
+COPY ahbe_conf /etc/
 
 ENV STORAGE_PATH=/mnt/storage
-RUN mkdir ${STORAGE_PATH}
+RUN mkdir -p ${STORAGE_PATH}
 
 RUN /sbin/proftpd --configtest
 
 COPY docker-entrypoint.sh /
-
-ENV PASSWORD_FILE=/hostfs/passwd-s3fs
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["supervisord"]
