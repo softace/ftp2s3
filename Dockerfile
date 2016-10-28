@@ -2,16 +2,19 @@ FROM centos:centos7.2.1511
 
 ### START Copied section, see https://hub.docker.com/_/centos/
 MAINTAINER "Jarl Friis" <jarl@softace.dk>
-ENV container docker
-RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
-rm -f /lib/systemd/system/multi-user.target.wants/*;\
-rm -f /etc/systemd/system/*.wants/*;\
-rm -f /lib/systemd/system/local-fs.target.wants/*; \
-rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-rm -f /lib/systemd/system/basic.target.wants/*;\
-rm -f /lib/systemd/system/anaconda.target.wants/*;
-VOLUME [ "/sys/fs/cgroup" ]
-CMD ["/usr/sbin/init"]
 ### END Copied section
 
+RUN yum install -y epel-release
+RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+RUN yum -y update
+RUN yum install -y \
+  openssl \
+  proftpd \
+  proftpd-utils \
+  supervisor
+
+COPY supervisord.conf /etc/supervisord.conf
+
+RUN /sbin/proftpd --configtest
+
+CMD ["/bin/supervisord"]
